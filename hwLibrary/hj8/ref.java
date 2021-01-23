@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StreamTokenizer;
+
+import java.io.StreamTokenizer; /*
+    read input from terminal
+*/ 
 
 /**
  * 合并表记录,先输入键值对的个数
