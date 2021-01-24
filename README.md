@@ -1,5 +1,3 @@
-20210121 until now I still cant see what it benefits to learn algorithms.
-
 ## useful resources
 
 - [LeetCode Animation](https://github.com/MisterBooo/LeetCodeAnimation)
