@@ -9,7 +9,7 @@ public class Main {
 
     public static boolean getInput(String str, String[] command) {
 
-
+        
 
         Pattern r = Pattern.compile("^([ASWD])(\\d+)$");
         Matcher matchRes = r.matcher(str);
