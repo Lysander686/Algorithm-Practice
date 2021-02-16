@@ -1,129 +1,101 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        List<String> strList = new ArrayList<String>();
-        String result = "";
-        while (in.hasNextLine()) {
-            String str = in.nextLine();
-            strList.add(str);
-            result = Main.getCount(strList);
-        }
-        in.close();
-        System.out.println(result);
-    }
-
-    public static String getCount(List<String> list) {
-        int a = 0;
-        int b = 0;
-        int c = 0;
-        int d = 0;
-        int e = 0;
-        int error = 0;
-        int prit = 0;
-
-        for (String s : list) {
-            String str = s.toString();
-            String ip = str.substring(0, str.indexOf(""));
-            String dns = str.substring(str.indexOf("") + 1, str.length());
-            //判断子网掩码
-            String[] dnsArr = dns.split(".");
-            //判断ip
-            String[] ips = ip.split(".");
-            int ip1;
-            int ip2;
-            int ip3;
-            int ip4;
-            int dns1;
-            int dns2;
-            int dns3;
-            int dns4;
-            String dns5;
-            try {
-                ip1 = Integer.parseInt(ips[0]);
-                ip2 = Integer.parseInt(ips[1]);
-                ip3 = Integer.parseInt(ips[2]);
-                ip4 = Integer.parseInt(ips[3]);
-                dns1 = Integer.parseInt(dnsArr[0]);
-                dns2 = Integer.parseInt(dnsArr[1]);
-                dns3 = Integer.parseInt(dnsArr[2]);
-                dns4 = Integer.parseInt(dnsArr[3]);
-                dns5 = leftPade(Integer.toBinaryString(dns1)) + leftPade(Integer.toBinaryString(dns1))
-                        + leftPade(Integer.toBinaryString(dns2)) + leftPade(Integer.toBinaryString(dns3))
-                        + leftPade(Integer.toBinaryString(dns4));
-
-            } catch (Exception f) {
-                error += 1;
-                continue;
+        Scanner sc = new Scanner(System.in);
+        int[] count = new int[7];
+        while (sc.hasNext()) {
+            String str = sc.nextLine();
+            String[] IPandYM = str.split("~");
+            String[] YMarray = IPandYM[1].split("\\.");
+            String[] IParray = IPandYM[0].split("\\.");
+            boolean YMisWrong = false;
+            String YMstr = "";
+            for (int i = 0; i < 4; i++) {
+                YMstr = YMstr + getBinary(Integer.parseInt(YMarray[i]));
             }
-            ;
-            //A类地址1.0.0.0126.255.255.255;
-            // B类地址128.0.0.0191.255.255.255;
-            //C类地址192.0.0.0223.255.255.255;
-            // D类地址224.0.0.0239.255.255.255；
-            // E类地址240.0.0.0~255.255.255.255
-            // 私网IP范围是：
-            //10.0.0.0～10.255.255.255
-            // 172.16.0.0～172.31.255.255
-            //192.168.0.0～192.168.255.255
-            //判断子网掩码是否正确
-            int a1 = dns5.indexOf("1");
-            int b1 = dns5.lastIndexOf("1");
-            //子网掩码全是1 非法
-            if (b1 == dns5.length() - 1) {
-                error += 1;
-                continue;
-            }
+            if (YMstr.indexOf("0") == -1 || YMstr.indexOf("1") == -1 || YMstr.indexOf("0") < YMstr.lastIndexOf("1")
+                    || IParray.length != 4 || YMarray.length != 4) {
+                YMisWrong = true;
+                count[5]++;
 
-            //子网掩码全是0 非法
-            if (b1 == -1) {
-                error += 1;
-                continue;
-            }
-            String tmpDns = dns5.substring(a1, b1);
-            int c1 = tmpDns.indexOf("0");
-            if (c1 != -1) {
-                error += 1;
-                continue;
-            }
 
-            if (ip1 > 0 && ip1 < 127) {
-                if (ip1 == 10) {
-                    prit += 1;
+            }
+            if (!YMisWrong) {
+                if (IParray[0] != "" && Integer.parseInt(IParray[0]) >= 1 && Integer.parseInt(IParray[0]) <= 126) {
+                    if (!IParray[1].equals("") && IParray[2] != "" && IParray[3] != "" &&
+                            Integer.parseInt(IParray[1]) >= 0 && Integer.parseInt(IParray[1]) <= 255 &&
+                            Integer.parseInt(IParray[2]) >= 0 && Integer.parseInt(IParray[2]) <= 255 &&
+                            Integer.parseInt(IParray[3]) >= 0 && Integer.parseInt(IParray[3]) <= 255) {
+                        count[0]++;
+                        if (Integer.parseInt(IParray[0]) == 10) count[6]++;
+                    }
+                } else if (IParray[0] != "" && Integer.parseInt(IParray[0]) >= 128 && Integer.parseInt(IParray[0]) <= 191) {
+                    if (IParray[1] != "" && IParray[2] != "" && IParray[3] != "" &&
+                            Integer.parseInt(IParray[1]) >= 0 && Integer.parseInt(IParray[1]) <= 255 &&
+                            Integer.parseInt(IParray[2]) >= 0 && Integer.parseInt(IParray[2]) <= 255 &&
+                            Integer.parseInt(IParray[3]) >= 0 && Integer.parseInt(IParray[3]) <= 255) {
+                        count[1]++;
+                        if (Integer.parseInt(IParray[0]) == 172 && Integer.parseInt(IParray[1]) >= 16 && Integer.parseInt(IParray[1]) <= 31)
+                            count[6]++;
+                    }
+                } else if (IParray[0] != "" && Integer.parseInt(IParray[0]) >= 192 && Integer.parseInt(IParray[0]) <= 223) {
+                    if (IParray[1] != "" && IParray[2] != "" && IParray[3] != "" &&
+                            Integer.parseInt(IParray[1]) >= 0 && Integer.parseInt(IParray[1]) <= 255 &&
+                            Integer.parseInt(IParray[2]) >= 0 && Integer.parseInt(IParray[2]) <= 255 &&
+                            Integer.parseInt(IParray[3]) >= 0 && Integer.parseInt(IParray[3]) <= 255) {
+                        count[2]++;
+                        if (Integer.parseInt(IParray[0]) == 192 && Integer.parseInt(IParray[1]) == 168) count[6]++;
+                    }
+                } else if (IParray[0] != "" && Integer.parseInt(IParray[0]) >= 224 && Integer.parseInt(IParray[0]) <= 239) {
+                    if (IParray[1] != "" && IParray[2] != "" && IParray[3] != "" &&
+                            Integer.parseInt(IParray[1]) >= 0 && Integer.parseInt(IParray[1]) <= 255 &&
+                            Integer.parseInt(IParray[2]) >= 0 && Integer.parseInt(IParray[2]) <= 255 &&
+                            Integer.parseInt(IParray[3]) >= 0 && Integer.parseInt(IParray[3]) <= 255) {
+                        count[3]++; 
+                    }
+                } else if (IParray[0] != "" && Integer.parseInt(IParray[0]) >= 240 && Integer.parseInt(IParray[0]) <= 255) {
+                    if (IParray[1] != "" && IParray[2] != "" && IParray[3] != "" &&
+                            Integer.parseInt(IParray[1]) >= 0 && Integer.parseInt(IParray[1]) <= 255 &&
+                            Integer.parseInt(IParray[2]) >= 0 && Integer.parseInt(IParray[2]) <= 255 &&
+                            Integer.parseInt(IParray[3]) >= 0 && Integer.parseInt(IParray[3]) <= 255) {
+                        count[4]++;
+                    }
+                } else {
+                    if (Integer.parseInt(IParray[0]) != 0 && Integer.parseInt(IParray[0]) != 127) {
+                        count[5]++;
+                    }
                 }
-                a += 1;
-            } else if (ip1 > 127 && ip1 < 192) {
-                b += 1;
-                if (ip1 == 172 && ip2 >= 16 && ip2 <= 31) {
-                    prit += 1;
-                }
-            } else if (ip1 > 191 && ip1 < 224) {
-                c += 1;
-                if (ip1 == 192 && ip2 == 168) {
-                    prit += 1;
-                }
-            } else if (ip1 > 223 && ip1 < 240) {
-                d += 1;
-            } else if (ip1 > 239 && ip1 < 260) {
-                e += 1;
             }
+
 
         }
-        return a + " " + b + " " + c + " " + d + " " + e + " " + error + " " + prit;
+        System.out.println(count[0] + " " + count[1] + " " + count[2] + " " + count[3] + " " + count[4] + " " + count[5] + " " + count[6]);
     }
 
-    private static String leftPade(String str) {
-        String result = "";
-        if (str.length() < 8) {
-            for (int i = 0; i < 8 - str.length(); i++) {
-                result = "0" + str;
-            }
-        } else {
-            result = str;
+    public static String getBinary(int num) {
+        int currentNum = num;//存放当前的被除数
+        LinkedList<String> list = new LinkedList<String>();//存放余数，也是就二进制数
+        if (num == 0) {
+            return "00000000";
         }
-        return result;
-    }
-}
+        while (currentNum != 0) {
+            if (currentNum % 2 == 0) {
+                list.addFirst("0");
+            } else {
+                list.addFirst("1");
+            }
+            currentNum /= 2;
+        }
+
+        StringBuilder sb = new StringBuilder();//当然你可以使用其他形式作为方法的返回
+        if (list.size() < 8) {
+            for (int i = 0; i < 8 - list.size(); i++) {
+                sb.append("0");
+            }
+        }
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+        }
+
+        return sb.toString();
